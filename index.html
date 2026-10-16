@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choose Your Party</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #efe4cc;
+    --paper: #f8f0dc;
+    --ink: #2b2118;
+    --muted: #6b5a47;
+    --line: #cdb995;
+    --exotic: #8a2c1d;
+    --classic: #1f4e6b;
+    --accent: var(--exotic);
+    --shadow: 0 2px 10px rgba(60, 40, 20, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1712;
+      --paper: #27201a;
+      --ink: #eee2cb;
+      --muted: #b3a185;
+      --line: #4a3d2f;
+      --exotic: #e0785f;
+      --classic: #7fb6d8;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 18px/1.5 "Crimson Pro", Georgia, serif;
+  }
+  body.classic { --accent: var(--classic); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { text-align: center; margin-bottom: 28px; }
+  h1, h2, h3, .tab, .label { font-family: "Cinzel", serif; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin: 0 0 6px; letter-spacing: .04em; }
+  .sub { color: var(--muted); font-style: italic; margin: 0 auto; max-width: 640px; }
+
+  .tabs { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 24px 0 32px; }
+  .tab {
+    border: 2px solid var(--line); background: var(--paper); color: var(--ink);
+    padding: 10px 20px; border-radius: 999px; cursor: pointer; font-size: .95rem; font-weight: 700;
+    letter-spacing: .05em;
+  }
+  .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  body.compare .tab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+  section[hidden] { display: none; }
+  .party-head { text-align: center; margin-bottom: 20px; }
+  .party-head h2 { color: var(--accent); margin: 0; font-size: clamp(1.5rem, 4vw, 2rem); }
+  .party-head p { margin: 4px 0 0; color: var(--muted); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--paper); border: 1px solid var(--line); border-top: 5px solid var(--accent);
+    border-radius: 10px; padding: 18px; box-shadow: var(--shadow);
+  }
+  .card h3 { margin: 0; font-size: 1.2rem; }
+  .card .race { color: var(--accent); font-weight: 600; margin: 2px 0 10px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag { font-size: .8rem; border: 1px solid var(--line); border-radius: 999px; padding: 1px 10px; color: var(--muted); }
+  .row { margin-top: 10px; }
+  .label { display: block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .row p { margin: 2px 0 0; }
+  .blurb { font-style: italic; }
+
+  .story { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 22px; margin-top: 24px; box-shadow: var(--shadow); }
+  .story h3 { margin: 0 0 10px; color: var(--accent); }
+  .story p { margin: 0 0 12px; }
+  .story ul { margin: 0; padding-left: 20px; }
+  .story li { margin-bottom: 6px; }
+  .note { font-size: .9rem; color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: "Cinzel", serif; font-size: .8rem; letter-spacing: .06em; }
+  thead th { background: var(--bg); }
+  td.slot { font-family: "Cinzel", serif; font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  .ex { color: var(--exotic); }
+  .cl { color: var(--classic); }
+  .pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+  .pick .story { margin: 0; border-top: 5px solid var(--exotic); }
+  .pick .story.cl-box { border-top-color: var(--classic); }
+  .pick .story.cl-box h3 { color: var(--classic); }
+  .pick .story.ex-box h3 { color: var(--exotic); }
+  footer { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Choose Your Party</h1>
+    <p class="sub">Four travelers on the road to the capital, a few days from journey's end. Pick the band of heroes your table wants to play, then pick your character.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="exotic" aria-selected="true">The Exotic</button>
+    <button class="tab" role="tab" data-tab="classic" aria-selected="false">The Classic</button>
+    <button class="tab" role="tab" data-tab="compare" aria-selected="false">Side by Side</button>
+  </div>
+
+  <!-- EXOTIC -->
+  <section id="exotic">
+    <div class="party-head">
+      <h2>The Exotic Party</h2>
+      <p>A dragonborn noble, his half-orc guard, a smooth-talking widow, and a wandering elf.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Feng</h3>
+        <div class="race">Half-Orc Barbarian</div>
+        <div class="tags"><span class="tag">Chaotic Neutral</span><span class="tag">Outlander</span><span class="tag">Best: STR</span></div>
+        <p class="blurb">Young, huge, and quiet. Fiercely protective of his friends.</p>
+        <div class="row"><span class="label">Role</span><p>Front-line bruiser who soaks and deals heavy damage.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Make the names of his lost tribe legendary.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Never forgets an insult.</p></div>
+      </article>
+      <article class="card">
+        <h3>Mara</h3>
+        <div class="race">Human Warlock, Fiend Pact</div>
+        <div class="tags"><span class="tag">Chaotic Neutral</span><span class="tag">Charlatan</span><span class="tag">Best: CHA</span></div>
+        <p class="blurb">Quick-witted con artist with a joke for everything.</p>
+        <div class="row"><span class="label">Role</span><p>Ranged spellcaster, the party's talker and trickster.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Revenge on the noble who killed her brother.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Can't resist conning the powerful.</p></div>
+      </article>
+      <article class="card">
+        <h3>Balasar Norixius</h3>
+        <div class="race">Red Dragonborn Paladin</div>
+        <div class="tags"><span class="tag">Lawful Good</span><span class="tag">Noble</span><span class="tag">Best: STR</span></div>
+        <p class="blurb">Proud, well-dressed, and quick to take offense.</p>
+        <div class="row"><span class="label">Role</span><p>Armored defender with healing, the party's public face.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Win the approval of his family.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Hears threats in every word.</p></div>
+      </article>
+      <article class="card">
+        <h3>Althaea Starflower</h3>
+        <div class="race">Wood Elf Druid</div>
+        <div class="tags"><span class="tag">Chaotic Good</span><span class="tag">Hermit</span><span class="tag">Best: WIS</span></div>
+        <p class="blurb">Thoughtful scholar of nature who loves a good debate.</p>
+        <div class="row"><span class="label">Role</span><p>Healer, battlefield control, and nature expert.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Protect her druid circle and decide what to do with a dangerous secret.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Needs to win every argument.</p></div>
+      </article>
+    </div>
+
+    <div class="story">
+      <h3>How They Came Together</h3>
+      <p>Balasar Norixius was summoned to the capital by his father, and no son of the Norixius Clan travels without an escort. In a frontier trading post he hired Feng, a towering young half-orc who asked for little pay and seemed to know every trail by smell. A day later they were joined by a charming merchant's widow seeking safe passage north, who introduced herself as Lady Celise Aubren.</p>
+      <p>Three days out, the group found Althaea Starflower arguing with a pair of woodcutters over a felled tree. Feng stepped in before it turned ugly, and the elf, who was also bound for the capital with business of her own, decided the company was worth keeping. She has spent most of the trip since debating Balasar about whether nobility is a natural law.</p>
+      <p>They are still a few days from the capital when they come upon a weary fisherman resting by the road.</p>
+      <p class="note">Mara's player decides when, or if, the others learn her real name.</p>
+    </div>
+
+    <div class="story">
+      <h3>Why They'd Take the Job</h3>
+      <ul>
+        <li><strong>Balasar:</strong> A noble's duty is to protect the common folk, and a heroic deed would look very good in a letter home.</li>
+        <li><strong>Feng:</strong> A ruined fishing ground is a wound to the natural world, and legends are made by answering calls like this.</li>
+        <li><strong>Mara:</strong> There's a reward, and a village elder is exactly the kind of person worth getting close to.</li>
+        <li><strong>Althaea:</strong> Something unnatural is poisoning the sea, and she's curious what it is.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CLASSIC -->
+  <section id="classic" hidden>
+    <div class="party-head">
+      <h2>The Classic Party</h2>
+      <p>A dwarf priest, a halfling card sharp, an elven professor, and a former army captain.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Kildrak Ungart</h3>
+        <div class="race">Hill Dwarf Cleric, Light Domain</div>
+        <div class="tags"><span class="tag">Lawful Good</span><span class="tag">Acolyte</span><span class="tag">Best: WIS</span></div>
+        <p class="blurb">Cheerful, devout, and endlessly optimistic.</p>
+        <div class="row"><span class="label">Role</span><p>Healer and support who can hold the line with a warhammer and holy light.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Rise in his faith and recover a long-lost holy relic.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Trusts anyone who claims to share his faith.</p></div>
+      </article>
+      <article class="card">
+        <h3>Vani Tealeaf</h3>
+        <div class="race">Halfling Rogue</div>
+        <div class="tags"><span class="tag">Chaotic Neutral</span><span class="tag">Charlatan</span><span class="tag">Best: DEX</span></div>
+        <p class="blurb">Card sharp with a joke for everything.</p>
+        <div class="row"><span class="label">Role</span><p>Scout, lockpick, and sneak-attack striker, the party's smooth talker.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Freedom, and settling her debt to the mentor who betrayed her.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Can't resist a pretty face.</p></div>
+      </article>
+      <article class="card">
+        <h3>Aramil Silverfrond</h3>
+        <div class="race">High Elf Wizard</div>
+        <div class="tags"><span class="tag">Chaotic Good</span><span class="tag">Sage</span><span class="tag">Best: INT</span></div>
+        <p class="blurb">Curious professor who'd rather study a monster than flee it.</p>
+        <div class="row"><span class="label">Role</span><p>Ranged spellcaster and the party's walking library.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Answer the question of where magic truly comes from.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Takes notes when he should be running.</p></div>
+      </article>
+      <article class="card">
+        <h3>Nulara Solar</h3>
+        <div class="race">Human Fighter</div>
+        <div class="tags"><span class="tag">Lawful Good</span><span class="tag">Soldier</span><span class="tag">Best: STR</span></div>
+        <p class="blurb">Disciplined, polite, and fiercely loyal.</p>
+        <div class="row"><span class="label">Role</span><p>Armored front-liner, tactician, and natural leader.</p></div>
+        <div class="row"><span class="label">Drive</span><p>Never leave a friend behind again.</p></div>
+        <div class="row"><span class="label">Watch out for</span><p>Hides a battlefield mistake she'd do anything to keep secret.</p></div>
+      </article>
+    </div>
+
+    <div class="story">
+      <h3>How They Came Together</h3>
+      <p>It started with a card game at a roadside inn. A cheerful halfling tea merchant named Pip Merriweather was winning far too often, and a pair of angry teamsters were about to do something about it. Kildrak, who had just shared a prayer with "Pip" over supper (she claimed to be a devoted follower of the Silver Flame), loudly vouched for her honesty. Aramil, reading by the fire, set down his book and asked each side to explain their position in full, which confused everyone long enough for Nulara to step between them and calmly suggest the teamsters go to bed. They did.</p>
+      <p>Over breakfast the four discovered they were all headed to the capital: Kildrak to report to his order's high temple, Aramil to visit its great library, Nulara to settle affairs left over from her army days, and Pip to wherever the purses were fattest. Safety in numbers seemed wise.</p>
+      <p>They are a few days into the journey together when they come upon a weary fisherman resting by the road.</p>
+      <p class="note">Vani's player decides when the others learn her real name.</p>
+    </div>
+
+    <div class="story">
+      <h3>Why They'd Take the Job</h3>
+      <ul>
+        <li><strong>Kildrak:</strong> Helping folk in need is the Silver Flame's work, and a good deed done well is noticed by those higher up.</li>
+        <li><strong>Vani:</strong> There's a reward, and a desperate village is an easy place to find a friendly game.</li>
+        <li><strong>Aramil:</strong> A mysterious slime ruining the fishing grounds? He has never read about anything like it.</li>
+        <li><strong>Nulara:</strong> People are suffering and asking for help. She won't walk past that.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="compare" hidden>
+    <div class="party-head">
+      <h2 style="color:var(--ink)">Side by Side</h2>
+      <p>Each party covers the same ground: a front-liner, a healer, a caster, and a talker.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th></th><th class="ex">The Exotic</th><th class="cl">The Classic</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="slot">Front Line</td><td><strong>Feng</strong>, Half-Orc Barbarian. Raw strength and toughness.</td><td><strong>Nulara</strong>, Human Fighter. Discipline and tactics.</td></tr>
+          <tr><td class="slot">Defender / Healer</td><td><strong>Balasar</strong>, Dragonborn Paladin. Heavy armor with healing hands.</td><td><strong>Kildrak</strong>, Dwarf Cleric. Dedicated healer with holy light.</td></tr>
+          <tr><td class="slot">Spellcaster</td><td><strong>Mara</strong>, Human Warlock. Fiendish blasts and trickery.</td><td><strong>Aramil</strong>, Elf Wizard. The widest spell list and deep lore.</td></tr>
+          <tr><td class="slot">Wild Card</td><td><strong>Althaea</strong>, Elf Druid. Nature magic, healing, and control.</td><td><strong>Vani</strong>, Halfling Rogue. Stealth, locks, and sneak attacks.</td></tr>
+          <tr><td class="slot">Party Face</td><td>Balasar or Mara</td><td>Vani or Nulara</td></tr>
+          <tr><td class="slot">Healing</td><td>Two healers (Balasar, Althaea)</td><td>One strong healer (Kildrak)</td></tr>
+          <tr><td class="slot">Built-in Drama</td><td>A con artist traveling with a noble, and two hot tempers in the same camp.</td><td>A devout priest who vouched for a cheat, and a captain hiding a secret.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pick">
+      <div class="story ex-box">
+        <h3>Pick the Exotic if...</h3>
+        <ul>
+          <li>You want unusual races and a bit of edge.</li>
+          <li>You like characters with tempers and grudges.</li>
+          <li>You want more magic and more healing.</li>
+        </ul>
+      </div>
+      <div class="story cl-box">
+        <h3>Pick the Classic if...</h3>
+        <ul>
+          <li>You want the iconic fantasy party.</li>
+          <li>You're newer to D&amp;D and want clear roles.</li>
+          <li>You want a rogue for stealth and traps.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>A one-shot for D&amp;D 5th Edition</footer>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const sections = { exotic: 1, classic: 1, compare: 1 };
+  function show(name) {
+    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === name));
+    Object.keys(sections).forEach(k => document.getElementById(k).hidden = k !== name);
+    document.body.className = name;
+    try { localStorage.setItem('partyTab', name); } catch (e) {}
+  }
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  let start = 'exotic';
+  try { start = localStorage.getItem('partyTab') || 'exotic'; } catch (e) {}
+  show(sections[start] ? start : 'exotic');
+</script>
+</body>
+</html>
